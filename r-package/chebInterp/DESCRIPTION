@@ -1,0 +1,15 @@
+Package: chebInterp
+Type: Package
+Title: Chebyshev Polynomial Interpolation
+Version: 0.1.0
+Authors@R: c(
+    person("Walter", "Zhang", , "walterwzhang@chicagobooth.edu",  role = c("aut", "cre")
+    ))
+Maintainer: Walter Zhang <walterwzhang@chicagoboth.edu>
+Description: Chebyshev polynomial interpolation routines
+License: GPL-3
+Depends: R (>= 3.1.0)
+Suggests: parallel, knitr, rmarkdown, reshape
+VignetteBuilder: knitr
+Encoding: UTF-8
+RoxygenNote: 6.1.1

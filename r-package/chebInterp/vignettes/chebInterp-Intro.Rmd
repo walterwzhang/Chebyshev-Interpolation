@@ -1,0 +1,131 @@
+---
+title: "chebInterp Introduction"
+author: "Walter Zhang"
+date: "February 8, 2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{chebInterp Introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(chebInterp)
+options(knitr.kable.NA = '')
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+In this vignette, we demonstrate how to use the chebInterp package to interpolate functions. The original use case of these functions was to interpolate the value function for a dynamic discrete choice problem. However, we will show how to us the functions in the package to interpolate simple functions. Let us consider the following three functions $f,g,h:\mathbb{R}^3 \mapsto \mathbb{R}$ that are defined as follows:
+$$f(x_1,x_2,x_3) = x_1x_3^3 + x_2x_3 + x_1^2x_2x_3^2 $$ 
+$$g(x_1, x_2, x_3) = x_1 \log(5+x_2)x_3 $$
+$$h(x_1,x_2,x_3) = x_1^2\cos(x_2)\exp(x_3)$$
+We also define $\mathbf{x} = [x_1,x_2,x_3]$. We want to approximate each function on the rectangle $([-5,2],[-2,4],[-3,3])$. To gauge approximation accuracy, we will then compare the Chebyshev approximation to a Monte Carlo evaluation at 10,000 uniforms draws on the bounded rectangle. $M$ is defined as interpolation nodes the and $N$ is number of degrees for the approximation.
+
+```{r}
+main   <-   function(args)
+{
+    bounds    <-   args$bounds
+    upper_b   <-   unlist(lapply(bounds, function(ii) ii[2]))
+    lower_b   <-   unlist(lapply(bounds, function(ii) ii[1]))
+    D   <-  args$D
+    N   <-  args$N
+    M   <-  args$M
+    
+    set.seed(args$base_seed)
+    # Simulate Draws
+    x_draws   <-   sapply(1:length(upper_b), function(i)
+    {
+        runif(args$draws, min = lower_b[i], max = upper_b[i])
+    })
+    
+    # Initialize the Chebyshev Approximation
+    cheb_init   <-   initializeChebyshevApproximator(D, N, M, upper_b = upper_b, lower_b = lower_b)
+    
+    # Compute Chebyshev Approximation Coefficients
+    cheb_function   <-   lapply(args$functions, function(func)
+    {
+        calculateChebyshevCoefficients(func, cheb_init, tolerance = args$tolerance)
+    })
+    
+    # Evaluate the Chebyshev Approximation
+    cheb_values   <-   lapply(cheb_function, function(func_coef)
+    {
+        evaluateChebyshev(x_draws, func_coef)
+    })
+    
+    # Evaluate the Functions
+    x_draws_df        <-   data.frame(x_draws)
+    function_values   <-   lapply(args$functions, function(func) func(x_draws_df)[,1])
+    
+    # Compute Summary of Absolute Deviations
+    summary_stats   <-   do.call(rbind, lapply(names(args$functions), function(func_name)
+    {
+        abs_deviation   <-   abs(cheb_values[[func_name]] - function_values[[func_name]])
+        data.frame(`Function`   =   func_name,
+                   Mean         =   mean(abs_deviation),
+                   SD           =   sd(abs_deviation),
+                   Max          =   max(abs_deviation),
+                   D   =   args$D,
+                   N   =   args$N,
+                   M   =   args$M
+                   )
+    }))
+    colnames(summary_stats)[1]   <-   "Function"
+
+    return(summary_stats)
+}
+```
+
+
+```{r}
+args <- list()
+args$base_seed <- 1234L
+args$bounds    <-   list(c(-5, 2), c(-2, 4), c(-3, 3))
+args$draws     <-   10000L
+
+args$D           <-   length(args$bounds)
+args$N           <- 3L
+args$M           <- 7L
+args$tolerance   <-   1e-12
+
+args$functions   <-   list()
+args$functions[["f"]]   <-   function(x) x[1]*x[3]^3 + x[2]*x[3] + x[1]^2*x[2]*x[3]^2
+args$functions[["g"]]   <-   function(x) x[1]*log(5 + x[2])*x[3]
+args$functions[["h"]]   <-   function(x) x[1]^2*cos(x[2])*exp(x[3])
+```
+
+With $N=3$ and $M=3$, we can compute the approximation error of the Chebyshev Interpolation for our functions. The Mean, SD, and Max are the respective mean. standard deviation. and maximum errors across the $10,000$ draws.
+
+```{r}
+knitr::kable(main(args), digits = 3)
+```
+
+We now examine the approximation error of function $g$ for a grid of $M$ and $N$ values. Specifically, we will consider $M\in\{1,\ldots,5\}$ and $N\in\{2,\ldots,7\}$.
+
+```{r}
+args$functions <- args$functions["g"]
+parameter_grid   <-   expand.grid(1:5L, 2:7L)
+colnames(parameter_grid)   <-   c("N", "M")
+parameter_grid   <-   subset(parameter_grid, M > N)
+```
+
+```{r}
+error_list   <-   lapply(1:nrow(parameter_grid), function(i)
+{
+    args_batch           <-   args
+    args_batch$N         <-   parameter_grid[i, "N"]
+    args_batch$M         <-   parameter_grid[i, "M"]
+
+    main(args_batch)
+})
+error_DF <- do.call(rbind, error_list)
+```
+
+```{r results = 'asis'}
+knitr::kable(reshape::cast(error_DF[c("N", "M", "Mean")], N~M, value = "Mean"), 
+             digits = 3,
+             caption = "Mean Approximation Error (N by M)")
+```

@@ -19,10 +19,10 @@ knitr::opts_chunk$set(
 ```
 
 In this vignette, we demonstrate how to use the chebInterp package to interpolate functions. The original use case of these functions was to interpolate the value function for a dynamic discrete choice problem. However, we will show how to us the functions in the package to interpolate simple functions. Let us consider the following three functions $f,g,h:\mathbb{R}^3 \mapsto \mathbb{R}$ that are defined as follows:
-$$f(x_1,x_2,x_3) = x_1x_3^3 + x_2x_3 + x_1^2x_2x_3^2 $$ 
+$$f(x_1,x_2,x_3) = x_1x_3^3 + x_2x_3 + x_1^2x_2x_3^2 $$
 $$g(x_1, x_2, x_3) = x_1 \log(5+x_2)x_3 $$
 $$h(x_1,x_2,x_3) = x_1^2\cos(x_2)\exp(x_3)$$
-We also define $\mathbf{x} = [x_1,x_2,x_3]$. We want to approximate each function on the rectangle $([-5,2],[-2,4],[-3,3])$. To gauge approximation accuracy, we will then compare the Chebyshev approximation to a Monte Carlo evaluation at 10,000 uniforms draws on the bounded rectangle. $M$ is defined as interpolation nodes the and $N$ is number of degrees for the approximation.
+We also define $\mathbf{x} = [x_1,x_2,x_3]$. We want to approximate each function on the rectangle $([-5,2],[-2,4],[-3,3])$. To gauge approximation accuracy, we will then compare the Chebyshev approximation to a Monte Carlo simulation with 10,000 uniforms draws on the bounded rectangle. $M$ is defined as interpolation nodes the and $N$ is number of degrees for the approximation.
 
 ```{r}
 main   <-   function(args)
@@ -33,33 +33,33 @@ main   <-   function(args)
     D   <-  args$D
     N   <-  args$N
     M   <-  args$M
-    
+
     set.seed(args$base_seed)
     # Simulate Draws
     x_draws   <-   sapply(1:length(upper_b), function(i)
     {
         runif(args$draws, min = lower_b[i], max = upper_b[i])
     })
-    
+
     # Initialize the Chebyshev Approximation
     cheb_init   <-   initializeChebyshevApproximator(D, N, M, upper_b = upper_b, lower_b = lower_b)
-    
+
     # Compute Chebyshev Approximation Coefficients
     cheb_function   <-   lapply(args$functions, function(func)
     {
         calculateChebyshevCoefficients(func, cheb_init, tolerance = args$tolerance)
     })
-    
+
     # Evaluate the Chebyshev Approximation
     cheb_values   <-   lapply(cheb_function, function(func_coef)
     {
         evaluateChebyshev(x_draws, func_coef)
     })
-    
+
     # Evaluate the Functions
     x_draws_df        <-   data.frame(x_draws)
     function_values   <-   lapply(args$functions, function(func) func(x_draws_df)[,1])
-    
+
     # Compute Summary of Absolute Deviations
     summary_stats   <-   do.call(rbind, lapply(names(args$functions), function(func_name)
     {
@@ -125,7 +125,7 @@ error_DF <- do.call(rbind, error_list)
 ```
 
 ```{r results = 'asis'}
-knitr::kable(reshape::cast(error_DF[c("N", "M", "Mean")], N~M, value = "Mean"), 
+knitr::kable(reshape::cast(error_DF[c("N", "M", "Mean")], N~M, value = "Mean"),
              digits = 3,
              caption = "Mean Approximation Error (N by M)")
 ```

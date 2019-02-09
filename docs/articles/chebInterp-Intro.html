@@ -82,7 +82,7 @@
 
     
     
-<p>In this vignette, we demonstrate how to use the chebInterp package to interpolate functions. The original use case of these functions was to interpolate the value function for a dynamic discrete choice problem. However, we will show how to us the functions in the package to interpolate simple functions. Let us consider the following three functions <span class="math inline">\(f,g,h:\mathbb{R}^3 \mapsto \mathbb{R}\)</span> that are defined as follows: <span class="math display">\[f(x_1,x_2,x_3) = x_1x_3^3 + x_2x_3 + x_1^2x_2x_3^2 \]</span> <span class="math display">\[g(x_1, x_2, x_3) = x_1 \log(5+x_2)x_3 \]</span> <span class="math display">\[h(x_1,x_2,x_3) = x_1^2\cos(x_2)\exp(x_3)\]</span> We also define <span class="math inline">\(\mathbf{x} = [x_1,x_2,x_3]\)</span>. We want to approximate each function on the rectangle <span class="math inline">\(([-5,2],[-2,4],[-3,3])\)</span>. To gauge approximation accuracy, we will then compare the Chebyshev approximation to a Monte Carlo evaluation at 10,000 uniforms draws on the bounded rectangle. <span class="math inline">\(M\)</span> is defined as interpolation nodes the and <span class="math inline">\(N\)</span> is number of degrees for the approximation.</p>
+<p>In this vignette, we demonstrate how to use the chebInterp package to interpolate functions. The original use case of these functions was to interpolate the value function for a dynamic discrete choice problem. However, we will show how to us the functions in the package to interpolate simple functions. Let us consider the following three functions <span class="math inline">\(f,g,h:\mathbb{R}^3 \mapsto \mathbb{R}\)</span> that are defined as follows: <span class="math display">\[f(x_1,x_2,x_3) = x_1x_3^3 + x_2x_3 + x_1^2x_2x_3^2 \]</span> <span class="math display">\[g(x_1, x_2, x_3) = x_1 \log(5+x_2)x_3 \]</span> <span class="math display">\[h(x_1,x_2,x_3) = x_1^2\cos(x_2)\exp(x_3)\]</span> We also define <span class="math inline">\(\mathbf{x} = [x_1,x_2,x_3]\)</span>. We want to approximate each function on the rectangle <span class="math inline">\(([-5,2],[-2,4],[-3,3])\)</span>. To gauge approximation accuracy, we will then compare the Chebyshev approximation to a Monte Carlo simulation with 10,000 uniforms draws on the bounded rectangle. <span class="math inline">\(M\)</span> is defined as interpolation nodes the and <span class="math inline">\(N\)</span> is number of degrees for the approximation.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">main   &lt;-<span class="st">   </span><span class="cf">function</span>(args)</a>
 <a class="sourceLine" id="cb1-2" title="2">{</a>
 <a class="sourceLine" id="cb1-3" title="3">    bounds    &lt;-<span class="st">   </span>args<span class="op">$</span>bounds</a>
@@ -91,33 +91,33 @@
 <a class="sourceLine" id="cb1-6" title="6">    D   &lt;-<span class="st">  </span>args<span class="op">$</span>D</a>
 <a class="sourceLine" id="cb1-7" title="7">    N   &lt;-<span class="st">  </span>args<span class="op">$</span>N</a>
 <a class="sourceLine" id="cb1-8" title="8">    M   &lt;-<span class="st">  </span>args<span class="op">$</span>M</a>
-<a class="sourceLine" id="cb1-9" title="9">    </a>
+<a class="sourceLine" id="cb1-9" title="9"></a>
 <a class="sourceLine" id="cb1-10" title="10">    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(args<span class="op">$</span>base_seed)</a>
 <a class="sourceLine" id="cb1-11" title="11">    <span class="co"># Simulate Draws</span></a>
 <a class="sourceLine" id="cb1-12" title="12">    x_draws   &lt;-<span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">sapply</a></span>(<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(upper_b), <span class="cf">function</span>(i)</a>
 <a class="sourceLine" id="cb1-13" title="13">    {</a>
 <a class="sourceLine" id="cb1-14" title="14">        <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(args<span class="op">$</span>draws, <span class="dt">min =</span> lower_b[i], <span class="dt">max =</span> upper_b[i])</a>
 <a class="sourceLine" id="cb1-15" title="15">    })</a>
-<a class="sourceLine" id="cb1-16" title="16">    </a>
+<a class="sourceLine" id="cb1-16" title="16"></a>
 <a class="sourceLine" id="cb1-17" title="17">    <span class="co"># Initialize the Chebyshev Approximation</span></a>
 <a class="sourceLine" id="cb1-18" title="18">    cheb_init   &lt;-<span class="st">   </span><span class="kw"><a href="../reference/initializeChebyshevApproximator.html">initializeChebyshevApproximator</a></span>(D, N, M, <span class="dt">upper_b =</span> upper_b, <span class="dt">lower_b =</span> lower_b)</a>
-<a class="sourceLine" id="cb1-19" title="19">    </a>
+<a class="sourceLine" id="cb1-19" title="19"></a>
 <a class="sourceLine" id="cb1-20" title="20">    <span class="co"># Compute Chebyshev Approximation Coefficients</span></a>
 <a class="sourceLine" id="cb1-21" title="21">    cheb_function   &lt;-<span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(args<span class="op">$</span>functions, <span class="cf">function</span>(func)</a>
 <a class="sourceLine" id="cb1-22" title="22">    {</a>
 <a class="sourceLine" id="cb1-23" title="23">        <span class="kw"><a href="../reference/calculateChebyshevCoefficients.html">calculateChebyshevCoefficients</a></span>(func, cheb_init, <span class="dt">tolerance =</span> args<span class="op">$</span>tolerance)</a>
 <a class="sourceLine" id="cb1-24" title="24">    })</a>
-<a class="sourceLine" id="cb1-25" title="25">    </a>
+<a class="sourceLine" id="cb1-25" title="25"></a>
 <a class="sourceLine" id="cb1-26" title="26">    <span class="co"># Evaluate the Chebyshev Approximation</span></a>
 <a class="sourceLine" id="cb1-27" title="27">    cheb_values   &lt;-<span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(cheb_function, <span class="cf">function</span>(func_coef)</a>
 <a class="sourceLine" id="cb1-28" title="28">    {</a>
 <a class="sourceLine" id="cb1-29" title="29">        <span class="kw"><a href="../reference/evaluateChebyshev.html">evaluateChebyshev</a></span>(x_draws, func_coef)</a>
 <a class="sourceLine" id="cb1-30" title="30">    })</a>
-<a class="sourceLine" id="cb1-31" title="31">    </a>
+<a class="sourceLine" id="cb1-31" title="31"></a>
 <a class="sourceLine" id="cb1-32" title="32">    <span class="co"># Evaluate the Functions</span></a>
 <a class="sourceLine" id="cb1-33" title="33">    x_draws_df        &lt;-<span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(x_draws)</a>
 <a class="sourceLine" id="cb1-34" title="34">    function_values   &lt;-<span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(args<span class="op">$</span>functions, <span class="cf">function</span>(func) <span class="kw">func</span>(x_draws_df)[,<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-35" title="35">    </a>
+<a class="sourceLine" id="cb1-35" title="35"></a>
 <a class="sourceLine" id="cb1-36" title="36">    <span class="co"># Compute Summary of Absolute Deviations</span></a>
 <a class="sourceLine" id="cb1-37" title="37">    summary_stats   &lt;-<span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/do.call">do.call</a></span>(rbind, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(args<span class="op">$</span>functions), <span class="cf">function</span>(func_name)</a>
 <a class="sourceLine" id="cb1-38" title="38">    {</a>
@@ -205,7 +205,7 @@
 <a class="sourceLine" id="cb5-7" title="7">    <span class="kw">main</span>(args_batch)</a>
 <a class="sourceLine" id="cb5-8" title="8">})</a>
 <a class="sourceLine" id="cb5-9" title="9">error_DF &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/do.call">do.call</a></span>(rbind, error_list)</a></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">knitr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>(reshape<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/reshape/topics/cast-9g">cast</a></span>(error_DF[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"N"</span>, <span class="st">"M"</span>, <span class="st">"Mean"</span>)], N<span class="op">~</span>M, <span class="dt">value =</span> <span class="st">"Mean"</span>), </a>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">knitr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>(reshape<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/reshape/topics/cast-9g">cast</a></span>(error_DF[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"N"</span>, <span class="st">"M"</span>, <span class="st">"Mean"</span>)], N<span class="op">~</span>M, <span class="dt">value =</span> <span class="st">"Mean"</span>),</a>
 <a class="sourceLine" id="cb6-2" title="2">             <span class="dt">digits =</span> <span class="dv">3</span>,</a>
 <a class="sourceLine" id="cb6-3" title="3">             <span class="dt">caption =</span> <span class="st">"Mean Approximation Error (N by M)"</span>)</a></code></pre></div>
 <table class="table">

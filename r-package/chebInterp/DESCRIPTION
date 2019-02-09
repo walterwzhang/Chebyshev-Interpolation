@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: c(
     person("Walter", "Zhang", , "walterwzhang@chicagobooth.edu",  role = c("aut", "cre")
     ))
-Maintainer: Walter Zhang <walterwzhang@chicagoboth.edu>
+Maintainer: Walter Zhang <walterwzhang@chicagobooth.edu>
 Description: Chebyshev polynomial interpolation routines
 License: GPL-3
 Depends: R (>= 3.1.0)

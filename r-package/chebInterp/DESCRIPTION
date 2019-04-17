@@ -13,3 +13,5 @@ Suggests: parallel, knitr, rmarkdown, reshape
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 6.1.1
+URL: https://github.com/walterwzhang/Chebyshev-Interpolation
+BugReports: https://github.com/walterwzhang/Chebyshev-Interpolation/issues

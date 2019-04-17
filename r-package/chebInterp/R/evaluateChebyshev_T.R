@@ -40,18 +40,38 @@ evaluateChebyshev_T   <-   function(x, cheb, parallel = FALSE, numcores = 1L)
         calculateChebyshevPolynomials(xi[,d], cheb$N)
     })
 
-    T   <-   do.call(rbind, mclapply(1:nrow(x), function(k)
+    T   <-   NULL
+    if (parallel)
     {
-        t1   <-   Ti[[1]][k,]
-        if (cheb$D >= 2)
+        T   <-   do.call(rbind, mclapply(1:nrow(x), function(k)
         {
-            for (d in 2:cheb$D)
+            t1   <-   Ti[[1]][k,]
+            if (cheb$D >= 2)
             {
-                t1   <-   kronecker(Ti[[d]][k,], t1)
+                for (d in 2:cheb$D)
+                {
+                    t1   <-   kronecker(Ti[[d]][k,], t1)
+                }
             }
-        }
-        t1
-    }, mc.cores = numcores))
+            t1
+        }, mc.cores = numcores))
+    } else
+    {
+        T   <-   do.call(rbind, lapply(1:nrow(x), function(k)
+        {
+            t1   <-   Ti[[1]][k,]
+            if (cheb$D >= 2)
+            {
+                for (d in 2:cheb$D)
+                {
+                    t1   <-   kronecker(Ti[[d]][k,], t1)
+                }
+            }
+            t1
+        }))
+    }
+
+
     return(T)
 }
 

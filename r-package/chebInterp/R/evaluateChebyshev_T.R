@@ -13,7 +13,7 @@
 
 evaluateChebyshev_T   <-   function(x, cheb, parallel = FALSE, numcores = 1L)
 {
-    stopifnot(class(x) == "matrix")
+    stopifnot(any(class(x) == "matrix"))
     stopifnot(ncol(x)  == cheb$D)
 
     xi   <-   sapply(1:cheb$D, function(d)
@@ -21,7 +21,7 @@ evaluateChebyshev_T   <-   function(x, cheb, parallel = FALSE, numcores = 1L)
         2*((x[,d]-cheb$lower_b[d])/cheb$delta[d]) - 1.0
     })
 
-    if(class(xi) != "matrix")
+    if(!any(class(xi) == "matrix"))
     {
         if (nrow(xi) == 1)
         {

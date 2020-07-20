@@ -9,7 +9,6 @@
 #'
 #' @docType package
 #' @author Walter Zhang <walterwzhang@chicagobooth.edu>
-#' @import parallel MASS
 #' @name chebinterp
 #' @noRd
 NULL

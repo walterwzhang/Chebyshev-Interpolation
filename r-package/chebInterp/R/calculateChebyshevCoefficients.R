@@ -23,7 +23,7 @@ calculateChebyshevCoefficients   <-   function(f, cheb, tolerance = 1e-12)
     # Compute Coefficients
     cheb1   <-   cheb
     y       <-   f(cheb1$X)
-    if (class(y) != "numeric")
+    if (!any(class(y) == "numeric"))
     {
         y   <-   y[,1]
     }

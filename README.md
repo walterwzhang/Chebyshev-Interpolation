@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/walterwzhang/Chebyshev-Interpolation.svg?branch=master)](https://travis-ci.com/walterwzhang/Chebyshev-Interpolation)
+
 # Chebyshev-Interpolation
 Chebyshev Polynomial Interpolation Routines
 
